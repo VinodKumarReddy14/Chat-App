@@ -1,10 +1,4 @@
-import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-export const hashing = async (word) => {
-  const salt = bcryptjs.genSalt(10);
-  return bcryptjs.hash(word, salt);
-};
 
 export const generateTokens = (userId, res) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {

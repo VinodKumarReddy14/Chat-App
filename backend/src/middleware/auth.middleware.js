@@ -1,4 +1,4 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import debug from "debug";
 const log = debug("auth.middleware:log");
@@ -8,13 +8,15 @@ export const protectRoute = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     if (!token)
-      res.status(400).json({ message: "Unauthorised - No Token Provided" });
+      return res
+        .status(400)
+        .json({ message: "Unauthorised - No Token Provided" });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded)
-      res.status(400).json({ message: "Unauthorised - Invalid Token" });
-    const user = await User.findById(decoded.userId).select("-password");
+      return res.status(400).json({ message: "Unauthorised - Invalid Token" });
+    const user = await User.findById(decoded.userId).select("-password").lean();
     if (!user) {
-      res.status(400).json({ message: "User not Found" });
+      return res.status(400).json({ message: "User not Found" });
     }
     req.user = user;
     next();
